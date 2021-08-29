@@ -3,7 +3,6 @@ module Test.Main where
 import Prelude (Unit, discard, ($), (<>))
 
 import Test.MySolutions
-import Test.NoPeeking.Solutions  -- This line should have been automatically deleted by resetSolutions.sh. See Chapter 2 for instructions.
 
 import Effect (Effect)
 import Control.Monad.Writer (runWriterT, execWriter)
@@ -22,7 +21,6 @@ main =
   runTest do
     test "" success
     {-  Move this block comment starting point to enable more tests
-This line should have been automatically deleted by resetSolutions.sh. See Chapter 2 for instructions. -}
     suite "Exercises Group - The State Monad" do
       suite "testParens" do
         let
@@ -129,5 +127,4 @@ This line should have been automatically deleted by resetSolutions.sh. See Chapt
         test "should fail if first is not a or b" do
           Assert.equal (Left ["Could not parse","Could not parse"])
             $ runParser asOrBs "foobar"
-{- This line should have been automatically deleted by resetSolutions.sh. See Chapter 2 for instructions.
 -}

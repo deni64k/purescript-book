@@ -55,14 +55,14 @@ triples n = do
   guard $ i*i + j*j == k*k
   pure [ i, j, k ]
 
-factorize :: Int -> Array Int
-factorize 1 = []
-factorize origNum = factorizeRec [] 2 origNum
-  where factorizeRec :: Array Int -> Int -> Int -> Array Int
-        factorizeRec res i x | i == origNum   = pure i
-                             | i >= x         = x:res
-                             | x `mod` i == 0 = factorizeRec (i:res) (i+1) $ reduceDiv x i
-                             | otherwise      = factorizeRec res (i+1) x
+primeFactors :: Int -> Array Int
+primeFactors 1 = []
+primeFactors origNum = primeFactorsRec [] 2 origNum
+  where primeFactorsRec :: Array Int -> Int -> Int -> Array Int
+        primeFactorsRec res i x | i == origNum   = pure i
+                                | i >= x         = x:res
+                                | x `mod` i == 0 = primeFactorsRec (i:res) (i+1) $ reduceDiv x i
+                                | otherwise      = primeFactorsRec res (i+1) x
         reduceDiv :: Int -> Int -> Int
         reduceDiv 1 _ = 1
         reduceDiv x i | x `mod` i == 0 = reduceDiv (x `quot` i) i

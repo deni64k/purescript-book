@@ -3,11 +3,11 @@ module Test.Main where
 import Prelude hiding (gcd)
 import Test.MySolutions
 
-import ChapterExamples (Amp(..), current, fromString, gcd, gcdV2, isEmpty, livesInLA, lzs, partialFunction, showPerson, showPersonV2, sortPair, takeFive, toString, unknownPerson, Volt(..))
+import ChapterExamples (Amp(..), Volt(..), current, fromString, gcd, gcdV2, isEmpty, lzs, partialFunction, showPerson, showPersonV2, sortPair, takeFive, toString, unknownPerson)
 import Data.Int (round)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Person (Person)
-import Data.Picture (Shape(..), Picture, getCenter, origin)
+import Data.Picture (Shape(..), Picture, getCenter, origin, shapeBounds)
 import Effect (Effect)
 import Test.Unit (TestSuite, suite, test)
 import Test.Unit.Assert as Assert
@@ -33,7 +33,6 @@ main :: Effect Unit
 main =
   runTest do
     runChapterExamples
-    {-  Move this block comment starting point to enable more tests
     suite "Exercise Group - Simple Pattern Matching" do
       test "Exercise - factorial" do
         Assert.equal 1
@@ -130,7 +129,6 @@ main =
         Assert.equal { top: 3.0, left: 3.0, right: 7.0, bottom: 7.0 }
           $ shapeBounds (Clipped samplePicture { x: 5.0, y: 5.0 } 4.0 4.0)
 
--}
 runChapterExamples :: TestSuite
 runChapterExamples =
   suite "Chapter Examples" do

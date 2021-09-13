@@ -2,12 +2,14 @@ module Main where
 
 import Prelude
 
-import Control.Monad.RWS (RWSResult(..), runRWS)
+import Control.Monad.Except.Trans (runExceptT)
+import Control.Monad.RWS.Trans (RWSResult(..), runRWST)
 import Data.Either (Either(..))
 import Data.Foldable (for_)
 import Data.GameEnvironment (GameEnvironment, gameEnvironment)
 import Data.GameState (GameState, initialGameState)
 import Data.Maybe (Maybe(..))
+import Data.Newtype (unwrap)
 import Data.Newtype (wrap)
 import Data.String (split)
 import Effect (Effect)
@@ -25,10 +27,12 @@ runGame env = do
   let
     lineHandler :: GameState -> String -> Effect Unit
     lineHandler currentState input = do
-      case runRWS (game (split (wrap " ") input)) env currentState of
-        RWSResult state _ written -> do
+      case unwrap $ runExceptT $ runRWST (game (split (wrap " ") input)) env currentState of
+        Right (RWSResult state _ written) -> do
           for_ written log
           RL.setLineHandler (lineHandler state) $ interface
+        Left err -> do
+          log $ "Error occurred: " <> err
       RL.prompt interface
       pure unit
 
@@ -48,3 +52,5 @@ main = runY (usage "$0 -p <player name>") $ map runGame env
                        false
           <*> flag "d" ["debug"]
                        (Just "Use debug mode")
+          <*> flag "c" ["cheat"]
+                       (Just "Use cheat mode")

@@ -20,7 +20,6 @@ main :: Effect Unit
 main =
   runTest do
     test "" success
-    {-  Move this block comment starting point to enable more tests
     suite "Exercises Group - The State Monad" do
       suite "testParens" do
         let
@@ -127,4 +126,3 @@ main =
         test "should fail if first is not a or b" do
           Assert.equal (Left ["Could not parse","Could not parse"])
             $ runParser asOrBs "foobar"
--}

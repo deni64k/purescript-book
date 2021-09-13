@@ -23,6 +23,7 @@ You can edit this file as you like.
   , "prelude"
   , "psci-support"
   , "strings"
+  , "stringutils"
   , "test-unit"
   ]
 , packages = ./packages.dhall

@@ -21,6 +21,17 @@ import Web.HTML (window)
 import Web.HTML.HTMLDocument (toNonElementParentNode)
 import Web.HTML.Window (document)
 
+-- data Field = FirstNameField
+--            | LastNameField
+--            | StreetField
+--            | CityField
+--            | StateField
+--            | PhoneField PhoneType
+
+-- data ValidationError = ValidationError String Field
+
+-- type ValidationErrors = Array ValidationError
+
 -- Note that there's a Purty formatting bug that
 -- adds an unwanted blank line
 -- https://gitlab.com/joneshf/purty/issues/77
@@ -29,13 +40,11 @@ renderValidationErrors [] = []
 renderValidationErrors xs =
   let
     renderError :: String -> R.JSX
-    renderError err = D.li_ [ D.text err ]
+    renderError err = D.div { className: "alert alert-danger row"
+                            , children: [ D.text err ]
+                            }
   in
-    [ D.div
-        { className: "alert alert-danger row"
-        , children: [ D.ul_ (map renderError xs) ]
-        }
-    ]
+    renderError <$> xs
 
 -- Helper function to render a single form field with an
 -- event handler to update
@@ -67,6 +76,13 @@ formField name placeholder value setValue =
             }
         ]
     }
+
+-- mkAddressBookApp :: Effect (ReactComponent {})
+-- mkAddressBookApp =
+--   reactComponent "AddressBookApp" \props -> R.do
+--     Tuple person setPerson <- useState examplePerson
+--     pure
+--       $ D.text "Hi! I'm an address book"
 
 mkAddressBookApp :: Effect (ReactComponent {})
 mkAddressBookApp =
@@ -129,10 +145,8 @@ mkAddressBookApp =
 main :: Effect Unit
 main = do
   log "Rendering address book component"
-  -- Get window object
-  w <- window
   -- Get window's HTML document
-  doc <- document w
+  doc <- document =<< window
   -- Get "container" element in HTML
   ctr <- getElementById "container" $ toNonElementParentNode doc
   case ctr of

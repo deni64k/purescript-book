@@ -2,7 +2,8 @@ module Game where
 
 import Prelude
 
-import Control.Monad.RWS (RWS)
+import Control.Monad.Except.Trans (ExceptT, throwError)
+import Control.Monad.RWS.Trans (RWST)
 import Control.Monad.Reader (ask)
 import Control.Monad.State (get, modify_, put)
 import Control.Monad.Writer (tell)
@@ -11,6 +12,7 @@ import Data.Foldable (for_)
 import Data.GameEnvironment (GameEnvironment(..))
 import Data.GameItem (GameItem(..), readItem)
 import Data.GameState (GameState(..))
+import Data.Identity (Identity)
 import Data.List as L
 import Data.Map as M
 import Data.Maybe (Maybe(..))
@@ -18,7 +20,7 @@ import Data.Set as S
 
 type Log = L.List String
 
-type Game = RWS GameEnvironment Log GameState
+type Game = RWST GameEnvironment Log GameState (ExceptT String Identity)
 
 describeRoom :: Game Unit
 describeRoom = do
@@ -41,6 +43,16 @@ pickUp item = do
                                 }
           tell (L.singleton ("You now have the " <> show item))
     _ -> tell (L.singleton "I don't see that item here.")
+
+cheat :: Game Unit
+cheat = do
+  GameState state <- get
+  let items = S.unions $ M.values state.items
+  let newItems = state.items <#> (\_ -> S.empty)
+  let newInventory = state.inventory `S.union` items
+  put $ GameState state { items     = newItems
+                        , inventory = newInventory
+                        }
 
 move :: Int -> Int -> Game Unit
 move dx dy = modify_ (\(GameState state) -> GameState (state { player = updateCoords state.player }))
@@ -98,6 +110,11 @@ game ["debug"] = do
     then do
       state :: GameState <- get
       tell (L.singleton (show state))
-    else tell (L.singleton "Not running in debug mode.")
+    else throwError "Not running in debug mode."
+game ["cheat"] = do
+  GameEnvironment env <- ask
+  if env.cheatMode
+    then cheat
+    else throwError "Not running in cheat mode."
 game [] = pure unit
-game _  = tell (L.singleton "I don't understand.")
+game _  = throwError "I don't understand."

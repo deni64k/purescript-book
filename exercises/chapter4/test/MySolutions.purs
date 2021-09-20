@@ -4,7 +4,7 @@ import Prelude
 
 import Control.Alternative (guard)
 import Data.Array ((..), (:), snoc, concat, concatMap, head, tail, null, filter, foldl, foldr)
-import Data.Int (quot)
+import Data.Int (quot, rem)
 import Data.Function (flip)
 import Data.Maybe (fromMaybe, maybe)
 
@@ -56,17 +56,12 @@ triples n = do
   pure [ i, j, k ]
 
 primeFactors :: Int -> Array Int
-primeFactors 1 = []
-primeFactors origNum = primeFactorsRec [] 2 origNum
-  where primeFactorsRec :: Array Int -> Int -> Int -> Array Int
-        primeFactorsRec res i x | i == origNum   = pure i
-                                | i >= x         = x:res
-                                | x `mod` i == 0 = primeFactorsRec (i:res) (i+1) $ reduceDiv x i
-                                | otherwise      = primeFactorsRec res (i+1) x
-        reduceDiv :: Int -> Int -> Int
-        reduceDiv 1 _ = 1
-        reduceDiv x i | x `mod` i == 0 = reduceDiv (x `quot` i) i
-                      | otherwise      = x
+primeFactors 1       = mempty
+primeFactors origNum = primeFactors' mempty 2 origNum
+  where primeFactors' :: Array Int -> Int -> Int -> Array Int
+        primeFactors' res i x | x == 1         = res
+                              | x `rem` i == 0 = primeFactors' (i:res) i $ x `quot` i
+                              | otherwise      = primeFactors' res (i+1) x
 
 allTrue :: Array Boolean -> Boolean
 allTrue = foldl (&&) true
